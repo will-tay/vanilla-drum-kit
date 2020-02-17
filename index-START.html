@@ -13,20 +13,18 @@
   const container = document.createElement('div')
   container.classList.add('keys')
   document.body.appendChild(container)
+  window.addEventListener('keydown', playSound)
 
   data.forEach(sound => {
     createAudio(sound)
     createElements(sound)
   })
 
-  window.addEventListener('keydown', playSound)
-  const keys = document.querySelectorAll('.key')
-  keys.forEach(key => key.addEventListener('transitionend', removeTransition))
-
   function createElements (sound) {
     const div = document.createElement('div')
     div.setAttribute('data-key', sound.code)
     div.classList.add('key')
+    div.addEventListener('transitionend', removeTransition)
 
     const kbd = document.createElement('kbd')
     kbd.innerText = sound.key
@@ -39,29 +37,27 @@
     container.appendChild(div)
   }
 
-  function createAudio (sound) {
+  function createAudio ({ code, src }) {
     const audio = document.createElement('audio')
-    audio.setAttribute('data-key', sound.code)
-    audio.src = sound.src
+    audio.setAttribute('data-key', code)
+    audio.src = src
     document.body.appendChild(audio)
   }
 
-  function playSound(e) {
-    const audio = document.querySelector(`audio[data-key="${e.keyCode}"]`)
-    const key = document.querySelector(`.key[data-key="${e.keyCode}"]`)
+  function playSound({ keyCode }) {
+    const audio = document.querySelector(`audio[data-key="${keyCode}"]`)
+    const key = document.querySelector(`.key[data-key="${keyCode}"]`)
     if(!audio) return
     audio.currentTime = 0 // rewind sample
     audio.play()
     key.classList.add('playing')
   }
 
-  function removeTransition (e) {
-    if (e.propertyName !== 'transform') return; // skip if not transform
+  function removeTransition ({ propertyName }) {
+    if (propertyName !== 'transform') return; // skip if not transform
     this.classList.remove('playing')
   }
 
 </script>
-
-
 </body>
 </html>
